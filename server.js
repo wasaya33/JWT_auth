@@ -5,6 +5,8 @@ import cors from 'cors';
 import connectDB from './config/mongodb.js';
 import authRouter from './routes/authRoutes.js';
 import CONFIG, { validateConfig } from './config/CONFIG.js'; // ✅ import CONFIG too
+import userAuth from './middleware/userAuth.js';
+import userRouter from './routes/userRoutes.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -20,6 +22,7 @@ app.use(cors({ credentials: true }));
 // routes
 app.get('/', (req, res) => res.send('API working'));
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter );
 
 // ✅ Validate configuration before starting the server
 try {
