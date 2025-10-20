@@ -2,7 +2,8 @@
 import nodemailer from 'nodemailer';
 
 import dotenv from 'dotenv';
-import CONFIG from './CONFIG.js';
+import CONFIG from '../CONFIG.js';
+
 
 dotenv.config();
 
