@@ -1,4 +1,42 @@
+// import { useState, createContext } from "react";
+// import { toast } from "react-toastify";
+// import axios from "axios";
+// export const AppContext = createContext();
+
+// export const AppContextProvider = ({ children }) => {
+//   const backendurl = import.meta.env.VITE_BACKEND_URL;
+//   const [isLoggedIn, setIsLoggedIn] = useState(false);
+//   const [userData, setUserData] = useState(null);
+
+//   const getUserdata = async () => {
+//     try {
+//       const { data } = await axios.get(backendurl +  '/api/user/data');
+//       data.Success ? setUserData(data.user) : toast.error(data.message || 'Failed to fetch user data');
+//     } catch (error) {
+//       toast.error(error.response?.data?.message || 'Something went wrong while fetching user data');
+//     }
+//   };
+
+
+//   const value = {
+//     backendurl,
+//     isLoggedIn,
+//     setIsLoggedIn,
+//     userData,
+//     setUserData,
+//     getUserdata
+//   };
+
+//   return (
+//     <AppContext.Provider value={value}>
+//       {children}
+//     </AppContext.Provider>
+//   );
+// };
+
 import { useState, createContext } from "react";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 export const AppContext = createContext();
 
@@ -7,17 +45,34 @@ export const AppContextProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userData, setUserData] = useState(null);
 
+  // ✅ Fetch user data
+  const getUserdata = async () => {
+    try {
+      const { data } = await axios.get(`${backendurl}/api/user/data`, {
+        withCredentials: true, // send cookies (JWT)
+      });
+
+      console.log("Fetched user data:", data);
+
+      if (data.success) {
+        setUserData(data.data); // ✅ backend returns { success, data: {name, ...} }
+        toast.success("User data updated");
+      } else {
+        toast.error(data.message || "Failed to fetch user data");
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong while fetching user data");
+    }
+  };
+
   const value = {
     backendurl,
     isLoggedIn,
     setIsLoggedIn,
     userData,
     setUserData,
+    getUserdata,
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

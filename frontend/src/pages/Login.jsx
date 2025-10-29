@@ -7,14 +7,16 @@ import axios from 'axios';
 
 const Login = () => {
   const navigate = useNavigate();
-  const { backendurl, setIsLoggedIn } = useContext(AppContext);
+  const { backendurl, setIsLoggedIn, getUserdata } = useContext(AppContext);
 
   const [state, setState] = useState('Sign Up');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const onSubmitHandler = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
       axios.defaults.withCredentials = true;
@@ -30,8 +32,10 @@ const Login = () => {
 
         if (data.Success === true) {
           setIsLoggedIn(true);
+          
+          console.log("User Data after Registration:", data.user);
           toast.success(data.message || 'Registered successfully!');
-          navigate('/');
+          setState("Login")
         } else {
           toast.error(data.message || 'Registration failed');
         }
@@ -46,6 +50,8 @@ const Login = () => {
         // ✅ FIXED: use capital "S" to match backend
         if (data.Success === true) {
           setIsLoggedIn(true);
+          getUserdata();
+          console.log("User Data after Login:", data.user);
           toast.success(data.message || 'Login successful!');
           navigate('/');
         } else {
@@ -55,6 +61,8 @@ const Login = () => {
     } catch (error) {
       console.error("Login Error:", error);
       toast.error(error.response?.data?.message || 'Something went wrong');
+    }finally {
+      setLoading(false);
     }
   };
 
@@ -69,10 +77,12 @@ const Login = () => {
 
       <div className='bg-slate-900 p-10 rounded-lg shadow-lg w-full sm:w-96 text-indigo-300 text-sm'>
         <h2 className='text-3xl font-semibold text-white text-center mb-3'>
-          {state === 'Sign Up' ? 'Create account' : 'Login'}
+          {
+          state === 'Sign Up' ? 'Create account' : 'Login'}
         </h2>
         <p className='text-center text-sm mb-6'>
-          {state === 'Sign Up' ? 'Create your account' : 'Login to your account'}
+          { loading ? 'Please wait a moment.' :
+          state === 'Sign Up' ? 'Create your account' : 'Login to your account'}
         </p>
 
         <form onSubmit={onSubmitHandler}>
@@ -118,8 +128,12 @@ const Login = () => {
             Forget password?
           </p>
 
-          <button className='w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium'>
-            {state}
+          <button className={`w-full py-2.5 rounded-full bg-gradient-to-r from-indigo-500 to-indigo-900 text-white font-medium ${loading ? 'cursor-not-allowed opacity-70' : 'hover:from-indigo-600 hover:to-indigo-800'}`} type="submit" disabled={loading}>
+            {loading 
+              ? (state === 'Sign Up' ? 'Creating account...' : 'Logging in...') 
+              :
+            
+            state}
           </button>
         </form>
 
