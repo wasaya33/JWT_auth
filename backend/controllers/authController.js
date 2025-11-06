@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
 import { registerEmailTemplate } from '../emailTemplates/registerEmail.js';
+import { EMAIL_VERIFY_TEMPLATE , PASSWORD_RESET_TEMPLATE } from '../config/emailTemplates.js';
 
 // ============================
 // REGISTER CONTROLLER
@@ -181,7 +182,8 @@ export const sendVerifyOtp = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Account Verification OTP",
-      text: `Hello ${user.name},\n\nYour OTP for account verification is: ${otp}. It is valid for 10 minutes.`,
+      // text: `Hello ${user.name},\n\nYour OTP for account verification is: ${otp}. It is valid for 10 minutes.`,
+      html: EMAIL_VERIFY_TEMPLATE.replace("{{otp}}",otp).replace("{{email}}",user.email)
     };
 
     await transporter.sendMail(mailOptions);
@@ -297,7 +299,8 @@ export const sendResetPasswordOtp = async (req, res) => {
       from: process.env.SENDER_EMAIL,
       to: user.email,
       subject: "Account Verification OTP",
-      text: `Your OTP for password reset is: ${otp}. It is valid for 15 minutes.`,
+      // text: `Your OTP for password reset is: ${otp}. It is valid for 15 minutes.`,
+      html: PASSWORD_RESET_TEMPLATE.replace("{{otp}}",otp).replace("{{email}}",user.email)
     };
 
     await transporter.sendMail(mailOptions);
